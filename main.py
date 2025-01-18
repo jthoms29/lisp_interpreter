@@ -19,28 +19,31 @@ class interpreter:
     """
     Implementation of the addition operator
     """
-    def add(self, a, b) -> int:
+    def add(self, a, b):
         return a + b
 
     """
     Implementation of the subtraction operator
     """
-    def subtract(self, a, b) -> int:
+    def subtract(self, a, b):
         return a - b
 
     """
     Implementation of the multiplication operator
     """
-    def multiply(self, a, b) -> int:
+    def multiply(self, a, b):
         return a * b
 
     """
     Implementation of the division operator
     """
-    def divide(self, a, b) -> int:
+    def divide(self, a, b):
         return a // b
-    
-    
+   
+
+    def define(self, a):
+        a = 3
+
 
     def evaluate(self, statement:list) -> int:
         keys = self.operations.keys()
@@ -68,9 +71,6 @@ class interpreter:
         return ret
 
 
-
-
-    
     """
     Parse the current input string. Will need to keep track of nested
     parentheses
@@ -86,17 +86,21 @@ class interpreter:
         # type as well as string index. This will allow nested parentheses
         # to be easily split and evaluated
         stack: list[int] = []
-        inp_len = len(inp_split)
 
-        for i in range(inp_len):
+        i:int = 0
+        while i < len(inp_split):
             if inp_split[i] == '(':
                 stack.append(i)
             if inp_split[i] == ')':
                 open_paren = stack.pop()
                 nested_statement = inp_split[open_paren+1:i]
+                nest_len = len(nested_statement)
                 val = self.evaluate(nested_statement)
-
-
+                del inp_split[open_paren:i]
+                i -= nest_len + 1
+                inp_split[i] = str(val)
+            
+            i+= 1
 
     """
     Get input from the user, a line to parse
