@@ -4,13 +4,15 @@ An attempt at writing a Scheme Lisp interpreter
 """
 
 class interpreter:
-    __current_str = ""
-    __operations = {}
+    current_str = ""
+    operations = {}
     
     def __init__(self):
-        self.__current_str = ""
-        self.__operations: dict[str, function] = \
-                {'+': self.add, '-': self.subtract, '*': self.multiply, \
+        self.current_str = ""
+        self.operations = \
+                {'+': self.add,
+                 '-': self.subtract,
+                 '*': self.multiply,
                  '/': self.divide}
 
 
@@ -35,26 +37,35 @@ class interpreter:
     """
     Implementation of the division operator
     """
-    def divide(self, a, b) -> float:
-        return a * b
+    def divide(self, a, b) -> int:
+        return a // b
     
     
 
-    def evaluate(self, statement:list):
-        keys = self.__operations.keys()
+    def evaluate(self, statement:list) -> int:
+        keys = self.operations.keys()
         oper_key:str = ''
         arg1:int = 0
         arg2:int = 0
+
         for c in statement:
-            if c in keys and oper_key == '':
+            if c in keys:
                 oper_key = c
-            elif arg1 == '':
+                continue
+
+            if oper_key == '':
+                print("Invalid")
+                return 0
+
+            if arg1 == 0:
                 arg1 = int(c)
-            elif arg2 == '':
+
+            elif arg2 == 0:
                 arg2 = int(c)
 
-        operation:function =  self.__operations.get(oper_key)
-        return operation(arg1, arg2)
+        ret = self.operations[oper_key](arg1, arg2)
+        print(ret)
+        return ret
 
 
 
@@ -65,11 +76,16 @@ class interpreter:
     parentheses
     """
     def parse_string(self, inp:str) -> None:
-        inp_split = inp.split()
+        # separate opening/closing terms from parentheses,
+        # split the input string at spaces, 
+        inp = inp.replace('(', '( ')
+        inp = inp.replace(')', ' )')
+        inp_split = inp.split(" ")
+
         # this stack will contain tuples corresponding to parentheses
         # type as well as string index. This will allow nested parentheses
         # to be easily split and evaluated
-        stack = []
+        stack: list[int] = []
         inp_len = len(inp_split)
 
         for i in range(inp_len):
@@ -77,14 +93,20 @@ class interpreter:
                 stack.append(i)
             if inp_split[i] == ')':
                 open_paren = stack.pop()
-                nested_statement = inp_split[open_paren, i]
-                val = evaluate(nested_statement)
+                nested_statement = inp_split[open_paren+1:i]
+                val = self.evaluate(nested_statement)
+
 
 
     """
     Get input from the user, a line to parse
     """
     def get_input(self) -> None:
-        self.__current_str = input();
+        strn = input();
+        self.parse_string(strn)
 
-    
+
+test = interpreter()
+test.__init__()
+while True:
+    test.get_input()
